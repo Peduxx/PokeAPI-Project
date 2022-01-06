@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using KotasProject.Controllers.Mapping;
 using KotasProject.Controllers.Utils;
 using KotasProject.Data;
 using KotasProject.Models;
@@ -17,10 +18,12 @@ namespace KotasProject.Controllers
 
         private readonly HttpClient _httpClient = new HttpClient();
         private readonly DataContext _context;
+        private readonly PokemonMapper _mapper;
 
         public MainController(DataContext context)
         {
             _context = context;
+            _mapper = new PokemonMapper();
         }
 
         //Get a single pokemon
@@ -38,6 +41,8 @@ namespace KotasProject.Controllers
             Pokemon pokemon = Newtonsoft.Json.JsonConvert.DeserializeObject<Pokemon>(content);
 
             pokemon.Sprites.Front_Default = StringConvert.FromStringToBase64(pokemon.Sprites.Front_Default);
+
+            Pokemon result = _mapper.Map(pokemon);
 
             return Ok(pokemon);
         }
@@ -101,8 +106,6 @@ namespace KotasProject.Controllers
 
             pokemon.Sprites.Front_Default = StringConvert.FromStringToBase64(pokemon.Sprites.Front_Default);
 
-            pokemon.TrainerId = pokemonTrainer.TrainerId;
-
             _context.Add(pokemonTrainer);
             _context.Add(pokemon);
             _context.SaveChanges();
@@ -122,13 +125,14 @@ namespace KotasProject.Controllers
 
             foreach (PokemonTrainer pokemonTrainer in pokemonTrainerList)
             {
-                Pokemon pokemon = _context.Pokemon.FirstOrDefault(p => p.Id == pokemonTrainer.PokemonId);
 
-                pokemon.Sprites = _context.Sprites.FirstOrDefault(s => s.PokemonId == pokemonTrainer.PokemonId);
+                HttpResponseMessage responseMessage = _httpClient.GetAsync(
+               $"https://pokeapi.co/api/v2/pokemon/{pokemonTrainer.PokemonId}"
+                ).Result;
 
-                pokemon.Abilities = _context.Abilities.Where(a => a.PokemonId == pokemonTrainer.PokemonId).ToList();
+                string content = responseMessage.Content.ReadAsStringAsync().Result;
 
-                //pokemon.Abilities.Ability
+                Pokemon pokemon = Newtonsoft.Json.JsonConvert.DeserializeObject<Pokemon>(content);
 
                 pokemonList.Add(pokemon);
             }

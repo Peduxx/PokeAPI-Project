@@ -3,34 +3,21 @@ using System;
 using KotasProject.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KotasProject.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220106114912_ThirdMigration")]
+    partial class ThirdMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.1");
 
-            modelBuilder.Entity("KotasProject.Models.Abilities", b =>
-                {
-                    b.Property<int>("Slot")
-                        .HasColumnType("INTEGER");
-
-                    b.ToTable("Abilities");
-                });
-
-            modelBuilder.Entity("KotasProject.Models.Ability", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT");
-
-                    b.ToTable("Ability");
-                });
 
             modelBuilder.Entity("KotasProject.Models.Pokemon", b =>
                 {
@@ -73,13 +60,6 @@ namespace KotasProject.Migrations
                     b.ToTable("PokemonTrainer");
                 });
 
-            modelBuilder.Entity("KotasProject.Models.Sprites", b =>
-                {
-                    b.Property<string>("Front_Default")
-                        .HasColumnType("TEXT");
-
-                    b.ToTable("Sprites");
-                });
 
             modelBuilder.Entity("KotasProject.Models.Trainer.Trainer", b =>
                 {

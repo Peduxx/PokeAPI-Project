@@ -11,12 +11,14 @@ namespace KotasProject.Data
         public DbSet<Trainer> Trainer { get; set; }
         public DbSet<PokemonTrainer> PokemonTrainer { get; set; }
         public DbSet<Pokemon> Pokemon { get; set; }
-        public DbSet<Sprites> Sprites { get; set; }
-        public DbSet<Abilities> Abilities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<PokemonTrainer>().HasKey(PT => new { PT.PokemonId, PT.TrainerId });
+
+            builder.Entity<Abilities>().HasNoKey();
+            builder.Entity<Ability>().HasNoKey();
+            builder.Entity<Sprites>().HasNoKey();
         }
 
     }

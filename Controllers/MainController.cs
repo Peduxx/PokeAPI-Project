@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using KotasProject.Controllers.Mapping;
 using KotasProject.Controllers.Utils;
 using KotasProject.Data;
 using KotasProject.Models;
 using KotasProject.Models.Trainer;
 using Microsoft.AspNetCore.Mvc;
+using PokeAPI_Project.Controllers.ExternalRequest;
 
 namespace KotasProject.Controllers
 {
@@ -18,31 +18,28 @@ namespace KotasProject.Controllers
 
         private readonly HttpClient _httpClient = new HttpClient();
         private readonly DataContext _context;
-        private readonly PokemonMapper _mapper;
 
         public MainController(DataContext context)
         {
             _context = context;
-            _mapper = new PokemonMapper();
         }
 
         //Get a single pokemon
 
         [HttpGet]
         [Route("[Action]")]
-        public IActionResult GetPokemon([FromQuery] int id)
+        public IActionResult GetPokemon([FromQuery] int? id, string name)
         {
-            HttpResponseMessage responseMessage = _httpClient.GetAsync(
-                           $"https://pokeapi.co/api/v2/pokemon/{id}"
-                      ).Result;
 
-            string content = responseMessage.Content.ReadAsStringAsync().Result;
+            Pokemon pokemon = new Pokemon();
 
-            Pokemon pokemon = Newtonsoft.Json.JsonConvert.DeserializeObject<Pokemon>(content);
+            if (id == null)
+                pokemon = PokeAPI.GetPokemonByName(name);
+
+            if (String.IsNullOrEmpty(name))
+                pokemon = PokeAPI.GetPokemonById(id);
 
             pokemon.Sprites.Front_Default = StringConvert.FromStringToBase64(pokemon.Sprites.Front_Default);
-
-            Pokemon result = _mapper.Map(pokemon);
 
             return Ok(pokemon);
         }
@@ -54,6 +51,7 @@ namespace KotasProject.Controllers
         public IActionResult GetRandomPokemon()
         {
             List<Pokemon> pokemonList = new List<Pokemon>();
+            Pokemon pokemon = new Pokemon();
 
             while (pokemonList.Count < 10)
             {
@@ -61,13 +59,7 @@ namespace KotasProject.Controllers
 
                 int pokemonId = RandomPokemonId.Next(1, 898);
 
-                HttpResponseMessage responseMessage = _httpClient.GetAsync(
-                $"https://pokeapi.co/api/v2/pokemon/{pokemonId}"
-           ).Result;
-
-                string content = responseMessage.Content.ReadAsStringAsync().Result;
-
-                Pokemon pokemon = Newtonsoft.Json.JsonConvert.DeserializeObject<Pokemon>(content);
+                pokemon = PokeAPI.GetPokemonById(pokemonId);
 
                 pokemon.Sprites.Front_Default = StringConvert.FromStringToBase64(pokemon.Sprites.Front_Default);
 
@@ -95,16 +87,13 @@ namespace KotasProject.Controllers
         [Route("[Action]")]
         public IActionResult CapturePokemon([FromBody] PokemonTrainer pokemonTrainer)
         {
+            Pokemon pokemon = new Pokemon();
 
-            HttpResponseMessage responseMessage = _httpClient.GetAsync(
-                $"https://pokeapi.co/api/v2/pokemon/{pokemonTrainer.PokemonId}"
-           ).Result;
-
-            string content = responseMessage.Content.ReadAsStringAsync().Result;
-
-            Pokemon pokemon = Newtonsoft.Json.JsonConvert.DeserializeObject<Pokemon>(content);
+            pokemon = PokeAPI.GetPokemonById(pokemonTrainer.PokemonId);
 
             pokemon.Sprites.Front_Default = StringConvert.FromStringToBase64(pokemon.Sprites.Front_Default);
+
+            pokemon.TrainerId = pokemonTrainer.TrainerId;
 
             _context.Add(pokemonTrainer);
             _context.Add(pokemon);
@@ -120,19 +109,15 @@ namespace KotasProject.Controllers
         public IActionResult GetAllCaptured([FromQuery] int trainerId)
         {
             List<Pokemon> pokemonList = new List<Pokemon>();
+            Pokemon pokemon = new Pokemon();
 
             IEnumerable<PokemonTrainer> pokemonTrainerList = _context.PokemonTrainer.ToList().Where(pt => pt.TrainerId == trainerId);
 
             foreach (PokemonTrainer pokemonTrainer in pokemonTrainerList)
             {
+                pokemon = PokeAPI.GetPokemonById(pokemonTrainer.PokemonId);
 
-                HttpResponseMessage responseMessage = _httpClient.GetAsync(
-               $"https://pokeapi.co/api/v2/pokemon/{pokemonTrainer.PokemonId}"
-                ).Result;
-
-                string content = responseMessage.Content.ReadAsStringAsync().Result;
-
-                Pokemon pokemon = Newtonsoft.Json.JsonConvert.DeserializeObject<Pokemon>(content);
+                pokemon.TrainerId = pokemonTrainer.TrainerId;
 
                 pokemonList.Add(pokemon);
             }

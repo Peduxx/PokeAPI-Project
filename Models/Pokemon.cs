@@ -18,5 +18,7 @@ namespace KotasProject.Models
 
         [NotMapped]
         public List<Abilities> Abilities { get; set; }
+
+        public int TrainerId { get; set; }
     }
 }

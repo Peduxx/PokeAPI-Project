@@ -2,7 +2,6 @@
 using KotasProject.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KotasProject.Migrations
 {
@@ -15,32 +14,16 @@ namespace KotasProject.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.1");
 
-            modelBuilder.Entity("KotasProject.Models.Abilities", b =>
-                {
-                    b.Property<int>("Slot")
-                        .HasColumnType("INTEGER");
-
-                    b.ToTable("Abilities");
-                });
-
-            modelBuilder.Entity("KotasProject.Models.Ability", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT");
-
-                    b.ToTable("Ability");
-                });
-
             modelBuilder.Entity("KotasProject.Models.Pokemon", b =>
                 {
-                    b.Property<int>("TrainerId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Height")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("TrainerId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -49,7 +32,9 @@ namespace KotasProject.Migrations
                     b.Property<int>("Weight")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("TrainerId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrainerId");
 
                     b.ToTable("Pokemon");
                 });
@@ -70,14 +55,6 @@ namespace KotasProject.Migrations
                     b.ToTable("PokemonTrainer");
                 });
 
-            modelBuilder.Entity("KotasProject.Models.Sprites", b =>
-                {
-                    b.Property<string>("Front_Default")
-                        .HasColumnType("TEXT");
-
-                    b.ToTable("Sprites");
-                });
-
             modelBuilder.Entity("KotasProject.Models.Trainer.Trainer", b =>
                 {
                     b.Property<int>("Id")
@@ -96,6 +73,20 @@ namespace KotasProject.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Trainer");
+                });
+
+            modelBuilder.Entity("KotasProject.Models.Pokemon", b =>
+                {
+                    b.HasOne("KotasProject.Models.Trainer", null)
+                        .WithMany("Pokemons")
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("KotasProject.Models.Trainer", b =>
+                {
+                    b.Navigation("Pokemons");
                 });
 #pragma warning restore 612, 618
         }

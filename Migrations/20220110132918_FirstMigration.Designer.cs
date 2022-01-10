@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KotasProject.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220106123824_FirstMigration")]
+    [Migration("20220110132918_FirstMigration")]
     partial class FirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -19,13 +19,13 @@ namespace KotasProject.Migrations
 
             modelBuilder.Entity("KotasProject.Models.Pokemon", b =>
                 {
-                    b.Property<int>("TrainerId")
+                    b.Property<int>("Id")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Height")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("TrainerId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -35,6 +35,8 @@ namespace KotasProject.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TrainerId");
 
                     b.ToTable("Pokemon");
                 });
@@ -73,6 +75,20 @@ namespace KotasProject.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Trainer");
+                });
+
+            modelBuilder.Entity("KotasProject.Models.Pokemon", b =>
+                {
+                    b.HasOne("KotasProject.Models.Trainer", null)
+                        .WithMany("Pokemons")
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("KotasProject.Models.Trainer", b =>
+                {
+                    b.Navigation("Pokemons");
                 });
 #pragma warning restore 612, 618
         }

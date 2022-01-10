@@ -15,12 +15,6 @@ namespace KotasProject.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<PokemonTrainer>().HasKey(PT => new { PT.PokemonId, PT.TrainerId });
-            builder.Entity<Pokemon>().HasKey(P => P.TrainerId);
-
-
-            builder.Entity<Abilities>().HasNoKey();
-            builder.Entity<Ability>().HasNoKey();
-            builder.Entity<Sprites>().HasNoKey();
         }
 
     }

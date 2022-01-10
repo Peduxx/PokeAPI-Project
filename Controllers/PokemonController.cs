@@ -1,27 +1,26 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using KotasProject.Controllers.Utils;
 using KotasProject.Data;
 using KotasProject.Models;
-using KotasProject.Models.Trainer;
 using Microsoft.AspNetCore.Mvc;
 using PokeAPI_Project.Controllers.ExternalRequest;
+using PokeAPI_Project.Controllers.Mapping;
+using PokeAPI_Project.Controllers.Models.Response;
 
 namespace KotasProject.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class MainController : ControllerBase
+    public class PokemonController : ControllerBase
     {
-
-        private readonly HttpClient _httpClient = new HttpClient();
         private readonly DataContext _context;
+        private readonly PokemonMapper _mapper;
 
-        public MainController(DataContext context)
+        public PokemonController(DataContext context)
         {
             _context = context;
+            _mapper = new PokemonMapper();
         }
 
         //Get a single pokemon
@@ -41,7 +40,9 @@ namespace KotasProject.Controllers
 
             pokemon.Sprites.Front_Default = StringConvert.FromStringToBase64(pokemon.Sprites.Front_Default);
 
-            return Ok(pokemon);
+            PokemonResponse response = _mapper.Map(pokemon);
+
+            return Ok(response);
         }
 
         //Get a multiple random pokemons
@@ -50,7 +51,7 @@ namespace KotasProject.Controllers
         [Route("[Action]")]
         public IActionResult GetRandomPokemon()
         {
-            List<Pokemon> pokemonList = new List<Pokemon>();
+            List<PokemonResponse> pokemonList = new List<PokemonResponse>();
             Pokemon pokemon = new Pokemon();
 
             while (pokemonList.Count < 10)
@@ -63,22 +64,12 @@ namespace KotasProject.Controllers
 
                 pokemon.Sprites.Front_Default = StringConvert.FromStringToBase64(pokemon.Sprites.Front_Default);
 
-                pokemonList.Add(pokemon);
+                PokemonResponse response = _mapper.Map(pokemon);
+
+                pokemonList.Add(response);
             }
 
             return Ok(pokemonList);
-        }
-
-        //Create new pokemon trainer
-
-        [HttpPost]
-        [Route("[Action]")]
-        public IActionResult CreateNewTrainer([FromBody] Trainer trainer)
-        {
-            _context.Add(trainer);
-            _context.SaveChanges();
-
-            return Ok("New pokemon trainer has successfully created!");
         }
 
         //Capture Pokemon
@@ -100,29 +91,6 @@ namespace KotasProject.Controllers
             _context.SaveChanges();
 
             return Ok("Pokemon has captured!");
-        }
-
-        //Get a multiple captured pokemons
-
-        [HttpGet]
-        [Route("[Action]")]
-        public IActionResult GetAllCaptured([FromQuery] int trainerId)
-        {
-            List<Pokemon> pokemonList = new List<Pokemon>();
-            Pokemon pokemon = new Pokemon();
-
-            IEnumerable<PokemonTrainer> pokemonTrainerList = _context.PokemonTrainer.ToList().Where(pt => pt.TrainerId == trainerId);
-
-            foreach (PokemonTrainer pokemonTrainer in pokemonTrainerList)
-            {
-                pokemon = PokeAPI.GetPokemonById(pokemonTrainer.PokemonId);
-
-                pokemon.TrainerId = pokemonTrainer.TrainerId;
-
-                pokemonList.Add(pokemon);
-            }
-
-            return Ok(pokemonList);
         }
     }
 }

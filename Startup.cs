@@ -31,7 +31,6 @@ namespace KotasProject
             );
 
             services.AddScoped<IPokemonService, PokemonService>();
-            services.AddScoped<IPokemonRepository, PokemonRepository>();
 
             services.AddScoped<ITrainerService, TrainerService>();
             services.AddScoped<ITrainerRepository, TrainerRepository>();

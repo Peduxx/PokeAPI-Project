@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using KotasProject.Controllers.Utils;
 using KotasProject.Models;
 using KotasProject.Models.Trainer;
+using PokeAPI_Project.Controllers.ExternalRequest;
 using PokeAPI_Project.Repositories.Interfaces;
 using PokeAPI_Project.Services.Interfaces;
 using PokeAPI_Project.Services.Validator;
@@ -24,6 +26,19 @@ namespace PokeAPI_Project.Services
             _validator.Validate(trainer);
 
             _trainerRepository.NewTrainer(trainer);
+        }
+
+        public void CapturePokemon(PokemonTrainer pokemonTrainer)
+        {
+            Pokemon pokemon = new Pokemon();
+
+            pokemon = PokeAPI.GetPokemonById(pokemonTrainer.PokemonId);
+
+            pokemon.Sprites.Front_Default = StringConvert.FromStringToBase64(pokemon.Sprites.Front_Default);
+
+            pokemon.TrainerId = pokemonTrainer.TrainerId;
+
+            _trainerRepository.CapturePokemon(pokemonTrainer, pokemon);
         }
 
         public List<Pokemon> GetAllCaptured(int trainerId)

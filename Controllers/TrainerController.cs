@@ -40,6 +40,17 @@ namespace PokeAPI_Project.Controllers
             return Ok("New pokemon trainer has successfully created!");
         }
 
+        //Capture Pokemon
+
+        [HttpPost]
+        [Route("[Action]")]
+        public IActionResult CapturePokemon([FromBody] PokemonTrainer pokemonTrainer)
+        {
+            _trainerService.CapturePokemon(pokemonTrainer);
+
+            return Ok("Pokemon has captured!");
+        }
+
         //Get a multiple captured pokemons
 
         [HttpGet]

@@ -4,7 +4,6 @@ using KotasProject.Controllers.Utils;
 using KotasProject.Models;
 using PokeAPI_Project.Controllers.ExternalRequest;
 using PokeAPI_Project.Controllers.Models.Response;
-using PokeAPI_Project.Repositories.Interfaces;
 using PokeAPI_Project.Services.Interfaces;
 using PokeAPI_Project.Services.Mapping;
 
@@ -12,12 +11,10 @@ namespace PokeAPI_Project.Services
 {
     public class PokemonService : IPokemonService
     {
-        private readonly IPokemonRepository _pokemonRepository;
         private readonly PokemonMapper _mapper;
 
-        public PokemonService(IPokemonRepository pokemonRepository)
+        public PokemonService()
         {
-            _pokemonRepository = pokemonRepository;
             _mapper = new PokemonMapper();
         }
 
@@ -59,19 +56,6 @@ namespace PokeAPI_Project.Services
             }
 
             return pokemonList;
-        }
-
-        public void CapturePokemon(PokemonTrainer pokemonTrainer)
-        {
-            Pokemon pokemon = new Pokemon();
-
-            pokemon = PokeAPI.GetPokemonById(pokemonTrainer.PokemonId);
-
-            pokemon.Sprites.Front_Default = StringConvert.FromStringToBase64(pokemon.Sprites.Front_Default);
-
-            pokemon.TrainerId = pokemonTrainer.TrainerId;
-
-            _pokemonRepository.CapturePokemon(pokemonTrainer, pokemon);
         }
     }
 }

@@ -38,16 +38,5 @@ namespace KotasProject.Controllers
 
             return Ok(pokemonList);
         }
-
-        //Capture Pokemon
-
-        [HttpPost]
-        [Route("[Action]")]
-        public IActionResult CapturePokemon([FromBody] PokemonTrainer pokemonTrainer)
-        {
-            _pokemonService.CapturePokemon(pokemonTrainer);
-
-            return Ok("Pokemon has captured!");
-        }
     }
 }

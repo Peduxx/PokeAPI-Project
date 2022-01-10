@@ -8,6 +8,8 @@ namespace PokeAPI_Project.Services.Interfaces
     {
         void NewTrainer(Trainer trainer);
 
+        void CapturePokemon(PokemonTrainer pokemonTrainer);
+
         List<Pokemon> GetAllCaptured(int trainerId);
     }
 }

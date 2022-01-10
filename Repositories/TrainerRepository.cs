@@ -17,6 +17,19 @@ namespace PokeAPI_Project.Repositories
             _context = context;
         }
 
+        public void NewTrainer(Trainer trainer)
+        {
+            _context.Add(trainer);
+            _context.SaveChanges();
+        }
+
+        public void CapturePokemon(PokemonTrainer pokemonTrainer, Pokemon pokemon)
+        {
+            _context.Add(pokemonTrainer);
+            _context.Add(pokemon);
+            _context.SaveChanges();
+        }
+
         public List<Pokemon> GetAllCaptured(int trainerId)
         {
             List<Pokemon> pokemonList = new List<Pokemon>();
@@ -35,11 +48,6 @@ namespace PokeAPI_Project.Repositories
 
             return pokemonList;
 
-        }
-        public void NewTrainer(Trainer trainer)
-        {
-            _context.Add(trainer);
-            _context.SaveChanges();
         }
     }
 }

@@ -9,7 +9,5 @@ namespace PokeAPI_Project.Services.Interfaces
         PokemonResponse GetPokemon(int? id, string name);
 
         List<PokemonResponse> GetRandomPokemon();
-
-        void CapturePokemon(PokemonTrainer pokemonTrainer);
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokeAPI_Project.Controllers.ExternalRequest;
 using PokeAPI_Project.Controllers.Mapping;
 using PokeAPI_Project.Controllers.Models.Request;
+using PokeAPI_Project.Services.Interfaces;
 
 namespace PokeAPI_Project.Controllers
 {
@@ -16,11 +17,13 @@ namespace PokeAPI_Project.Controllers
     {
         private readonly DataContext _context;
         private readonly TrainerMapper _mapper;
+        private readonly ITrainerService _trainerService;
 
-        public TrainerController(DataContext context)
+        public TrainerController(DataContext context, ITrainerService trainerService)
         {
             _context = context;
             _mapper = new TrainerMapper();
+            _trainerService = trainerService;
         }
 
 
@@ -32,8 +35,7 @@ namespace PokeAPI_Project.Controllers
         {
             Trainer trainer = _mapper.Map(trainerRequest);
 
-            _context.Add(trainer);
-            _context.SaveChanges();
+            _trainerService.NewTrainer(trainer);
 
             return Ok("New pokemon trainer has successfully created!");
         }
@@ -44,19 +46,7 @@ namespace PokeAPI_Project.Controllers
         [Route("[Action]")]
         public IActionResult GetAllCaptured([FromQuery] int trainerId)
         {
-            List<Pokemon> pokemonList = new List<Pokemon>();
-            Pokemon pokemon = new Pokemon();
-
-            IEnumerable<PokemonTrainer> pokemonTrainerList = _context.PokemonTrainer.ToList().Where(pt => pt.TrainerId == trainerId);
-
-            foreach (PokemonTrainer pokemonTrainer in pokemonTrainerList)
-            {
-                pokemon = PokeAPI.GetPokemonById(pokemonTrainer.PokemonId);
-
-                pokemon.TrainerId = pokemonTrainer.TrainerId;
-
-                pokemonList.Add(pokemon);
-            }
+            List<Pokemon> pokemonList = _trainerService.GetAllCaptured(trainerId);
 
             return Ok(pokemonList);
         }

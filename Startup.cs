@@ -1,18 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KotasProject.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using PokeAPI_Project.Repositories;
+using PokeAPI_Project.Repositories.Interfaces;
+using PokeAPI_Project.Services;
+using PokeAPI_Project.Services.Interfaces;
 
 namespace KotasProject
 {
@@ -32,6 +29,12 @@ namespace KotasProject
             services.AddDbContext<DataContext>(
                 context => context.UseSqlite(Configuration.GetConnectionString("Default"))
             );
+
+            services.AddScoped<IPokemonService, PokemonService>();
+            services.AddScoped<IPokemonRepository, PokemonRepository>();
+
+            services.AddScoped<ITrainerService, TrainerService>();
+            services.AddScoped<ITrainerRepository, TrainerRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

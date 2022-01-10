@@ -1,7 +1,7 @@
 using KotasProject.Models;
 using PokeAPI_Project.Controllers.Models.Response;
 
-namespace PokeAPI_Project.Controllers.Mapping
+namespace PokeAPI_Project.Services.Mapping
 {
     public class PokemonMapper
     {
